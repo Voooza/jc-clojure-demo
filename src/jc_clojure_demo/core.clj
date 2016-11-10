@@ -1,6 +1,8 @@
 (ns jc-clojure-demo.core
   (:gen-class))
 
+(println "Hello Java Community")
+
 ;; polish notation
 ;; coming from the fact that + is a function it follows same syntax asother functions  
 (+ 1 2 3)
@@ -19,6 +21,7 @@
 
 ;; Now lets sort a vector:
 (sort [3 2 1])
+(into [] (sort [3 2 1]))
 
 ;; Can we also sum it?
 (+ [1 2 3]) ;; throws java.lang.ClassCastException
@@ -43,7 +46,7 @@
 (a-function "argument" "another argument")
 ;; I can also print the docstring, because, well it's just data in the list
 (doc a-function)
-(name a-function)
+
 
 ;; function overloading within a single function
 ;; or as clojurist would  call it: multi-arity
@@ -64,11 +67,12 @@
        " and b is " b))
 
 (destructurer [1 2])
+(destructurer [1 2 3])
 
 ;; concurency
 (defn long-running-function
   [a]
-  (println "start")
+  (println "start")  ;; BTW: I can also evaluate this expression separately
   (Thread/sleep 1000) ;; see how I can call static java method easily from clojure
   (println (str "done with " a))
   a)
@@ -92,7 +96,41 @@
 
 
 ;; partial
+;; we already saw an example above with defining a ++ function
+;; Suppose you have a function which accepts multiple args
+;; and you figure out that you are often calling it with almost all argumets same
+;; altering only the last one or two
+(defn concat-and-print
+  [a b c d]
+  (println (clojure.string/join " " [a b c d])))
+
+(concat-and-print "a" "b" "c" "d")
+(concat-and-print "Hello" "," "Java" "community")
+
+(def afternoon-greeter (partial concat-and-print "Good" "afternoon"))
+
+(afternoon-greeter "Java" "community")
+(afternoon-greeter "Clojure" "enthusiasts")
+
+
 ;; composition
+;; if you have pure functions you can compose them
+(defn plus3
+  [x]
+  (+ x 3))
+
+(plus3 0)
+
+(defn times7
+  [x]
+  (* x 7))
+
+(times7 3)
+
+(def plus3times7 (comp times7 plus3))
+
+(plus3times7 3)
+
 ;; complement
 ;; reader macro
 
