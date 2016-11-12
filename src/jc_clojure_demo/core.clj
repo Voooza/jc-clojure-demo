@@ -1,4 +1,6 @@
 (ns jc-clojure-demo.core
+  (:import (java.util Date
+                      Calendar))
   (:gen-class))
 
 (println "Hello Java Community")
@@ -112,9 +114,20 @@
 (afternoon-greeter "Java" "community")
 (afternoon-greeter "Clojure" "enthusiasts")
 
+;; reader macro
+;; it's like partial when you want to suply non last arg
+;; please excuse the convoluted example
+(def cheer #(concat-and-print %1 %2 "for" "the win"))
+
+(cheer "Java" "community")
+(cheer "Clojure" "enthusiasts")
 
 ;; composition
 ;; if you have pure functions you can compose them
+(def negative-quotient (comp - /))
+(negative-quotient 2 3)
+
+;; any custom pure function is ok
 (defn plus3
   [x]
   (+ x 3))
@@ -132,9 +145,40 @@
 (plus3times7 3)
 
 ;; complement
-;; reader macro
+;; easily define a function with same effect but opposit boolean return value
+(defn bad?
+  [thing]
+  (:bad thing))
+
+;; I am going to rely on order of this HashMap now.
+;; Lets hope it works
+(def things
+  [{:name "apple" :categoty "fruits" :bad false}
+   {:name "Clojure" :categoty "programming languages" :bad false}
+   {:name "flu" :categoty "illnesses" :bad true}
+   {:name "knock knock" :categoty "jokes" :bad true}])
+
+(map bad? things)
+
+(def good? (complement bad?))
+
+(map good? things) 
+
 
 ;; thread last macro
 ;; exception handling
 ;; java interop
 ;; runtime polymorphysm - defmulti lino bunny
+
+
+
+
+
+
+
+
+
+
+
+
+
