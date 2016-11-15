@@ -1,6 +1,5 @@
 (ns jc-clojure-demo.core
-  (:import (java.util Date
-                      Calendar))
+  (:import (java.lang ArithmeticException))
   (:gen-class))
 
 (println "Hello Java Community")
@@ -70,6 +69,13 @@
 
 (destructurer [1 2])
 (destructurer [1 2 3])
+
+(def person {:name "Oliver" :gender "male" :age "40"})
+
+(let [{n :name g :gender a :age} person]
+  (println (str n " is " a " years old " g)))
+
+
 
 ;; concurency
 (defn long-running-function
@@ -153,10 +159,10 @@
 ;; I am going to rely on order of this HashMap now.
 ;; Lets hope it works
 (def things
-  [{:name "apple" :categoty "fruits" :bad false}
-   {:name "Clojure" :categoty "programming languages" :bad false}
-   {:name "flu" :categoty "illnesses" :bad true}
-   {:name "knock knock" :categoty "jokes" :bad true}])
+  [{:name "apple" :categoty "fruits" :bad false :count 20}
+   {:name "Clojure" :categoty "programming languages" :bad false :count 1}
+   {:name "flu" :categoty "illnesses" :bad true :count 100}
+   {:name "knock knock" :categoty "jokes" :bad true :count 10000}])
 
 (map bad? things)
 
@@ -164,11 +170,41 @@
 
 (map good? things) 
 
-
 ;; thread last macro
+;; let's say that we want to count good things now
+(reduce +
+        (map :count 
+             (filter good? things)))
+;; works fine but looks cryptic
+;; is there a better way?
+(->> things
+     (filter good?)
+     (map :count)
+     (reduce +))
+
 ;; exception handling
-;; java interop
+(try
+  (/ 1 0)
+  (catch ArithmeticException e (println (str "You cannot " (. e getMessage)))))
+
 ;; runtime polymorphysm - defmulti lino bunny
+;; we call seemingly the same method multiple times
+;; but based on rules defined 
+;; source: http://clojure.org/about/runtime_polymorphism
+(defmulti encounter (fn [x y] [(:Species x) (:Species y)]))
+(defmethod encounter [:Bunny :Lion] [b l] :run-away)
+(defmethod encounter [:Lion :Bunny] [l b] :eat)
+(defmethod encounter [:Lion :Lion] [l1 l2] :fight)
+(defmethod encounter [:Bunny :Bunny] [b1 b2] :mate)
+(def b1 {:Species :Bunny :other :stuff})
+(def b2 {:Species :Bunny :other :stuff})
+(def l1 {:Species :Lion :other :stuff})
+(def l2 {:Species :Lion :other :stuff})
+(encounter b1 b2)
+(encounter b1 l1)
+(encounter l1 b1)
+(encounter l1 l2)
+
 
 
 
